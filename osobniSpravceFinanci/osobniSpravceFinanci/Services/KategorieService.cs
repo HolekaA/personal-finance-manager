@@ -1,5 +1,6 @@
 ﻿using LiteDB;
 using osobniSpravceFinanci.Models;
+using System.Collections.Generic;
 
 namespace osobniSpravceFinanci.Services
 {

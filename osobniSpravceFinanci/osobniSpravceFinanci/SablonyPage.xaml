@@ -1,12 +1,105 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="osobniSpravceFinanci.SablonyPage"
-             Title="SablonyPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             BackgroundColor="#F5F7FA"
+             Title="Šablony"
+             Shell.NavBarIsVisible="False">
+
+    <Grid>
+        <Grid RowDefinitions="Auto, *" Padding="20">
+
+            <Border Grid.Row="0" Padding="15" StrokeShape="RoundRectangle 10" Stroke="LightGray" BackgroundColor="White" Margin="0,0,0,20">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Přidat novou šablonu" FontSize="18" FontAttributes="Bold" TextColor="#0056B3" />
+                    <Label x:Name="ChybaLabel" TextColor="#DC3545" FontSize="14" IsVisible="False" FontAttributes="Italic" />
+
+                    <Grid ColumnDefinitions="*, *" ColumnSpacing="10">
+                        <Entry Grid.Column="0" x:Name="NazevEntry" Placeholder="Název (např. Nájem)" TextColor="#333333" TextChanged="OnVstupZmenen" />
+                        <Entry Grid.Column="1" x:Name="CastkaEntry" Placeholder="Částka (Kč)" Keyboard="Numeric" TextColor="#333333" TextChanged="OnVstupZmenen" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*, *" ColumnSpacing="10">
+                        <Picker Grid.Column="0" x:Name="TypPicker" Title="Vyberte typ" TextColor="#333333" SelectedIndexChanged="OnVstupZmenen">
+                            <Picker.Items>
+                                <x:String>Výdaj</x:String>
+                                <x:String>Příjem</x:String>
+                            </Picker.Items>
+                        </Picker>
+
+                        <Picker Grid.Column="1" x:Name="KategoriePicker" Title="Vyberte kategorii" TextColor="#333333" ItemDisplayBinding="{Binding Nazev}" SelectedIndexChanged="OnVstupZmenen" />
+                    </Grid>
+
+                    <Button Text="Přidat šablonu" BackgroundColor="#28A745" TextColor="White" FontAttributes="Bold" CornerRadius="8" Clicked="OnPridatClicked" Margin="0,5,0,0"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <CollectionView Grid.Row="1" x:Name="SablonyList">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,0,0,10" Padding="15" StrokeShape="RoundRectangle 10" Stroke="LightGray" BackgroundColor="White">
+                            <Grid ColumnDefinitions="*, Auto, Auto, Auto">
+
+                                <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                                    <Label Text="{Binding Nazev}" FontSize="18" FontAttributes="Bold" TextColor="#333333"/>
+                                    <HorizontalStackLayout Spacing="5" Margin="0,2,0,0">
+                                        <BoxView Color="{Binding KategorieBarva}" WidthRequest="10" HeightRequest="10" CornerRadius="5" VerticalOptions="Center"/>
+                                        <Label Text="{Binding KategorieNazev}" FontSize="14" TextColor="#6C757D" VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+
+                                <Label Grid.Column="1" Text="{Binding CastkaZobrazeni}" TextColor="{Binding BarvaTypu}" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" Margin="0,0,15,0"/>
+
+                                <Button Grid.Column="2" Text="✎" CommandParameter="{Binding SablonaPuvodni}" Clicked="OnUpravitClicked" BackgroundColor="Transparent" TextColor="#0056B3" FontSize="20" WidthRequest="40" Padding="0"/>
+                                <Button Grid.Column="3" Text="🗑" CommandParameter="{Binding SablonaPuvodni}" Clicked="OnSmazatClicked" BackgroundColor="Transparent" TextColor="#DC3545" FontSize="20" WidthRequest="40" Padding="0"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <Grid x:Name="SmazatOverlay" BackgroundColor="#80000000" IsVisible="False" ZIndex="10">
+            <Border VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="320" Padding="25" StrokeShape="RoundRectangle 15" BackgroundColor="White">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Smazat šablonu" FontSize="20" FontAttributes="Bold" TextColor="#333333" HorizontalOptions="Center"/>
+                    <Label x:Name="SmazatTextLabel" Text="Opravdu chcete smazat tuto šablonu?" TextColor="#6C757D" HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="15" Margin="0,15,0,0">
+                        <Button Grid.Column="0" Text="Zrušit" BackgroundColor="#E2E3E5" TextColor="#333333" Clicked="OnZrusitSmazaniClicked" CornerRadius="8" FontAttributes="Bold"/>
+                        <Button Grid.Column="1" Text="Smazat" BackgroundColor="#DC3545" TextColor="White" Clicked="OnPotvrditSmazaniClicked" FontAttributes="Bold" CornerRadius="8" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <Grid x:Name="UpravitOverlay" BackgroundColor="#80000000" IsVisible="False" ZIndex="10">
+            <Border VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="320" Padding="25" StrokeShape="RoundRectangle 15" BackgroundColor="White">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Upravit šablonu" FontSize="20" FontAttributes="Bold" TextColor="#333333" HorizontalOptions="Center" Margin="0,0,0,10"/>
+
+                    <Label Text="Název a částka:" TextColor="#6C757D" FontSize="14" Margin="0,0,0,-5"/>
+                    <Grid ColumnDefinitions="*, *" ColumnSpacing="10">
+                        <Entry Grid.Column="0" x:Name="UpravitNazevEntry" TextColor="#333333" />
+                        <Entry Grid.Column="1" x:Name="UpravitCastkaEntry" Keyboard="Numeric" TextColor="#333333" />
+                    </Grid>
+
+                    <Label Text="Typ a kategorie:" TextColor="#6C757D" FontSize="14" Margin="0,5,0,-5"/>
+                    <Grid ColumnDefinitions="*, *" ColumnSpacing="10">
+                        <Picker Grid.Column="0" x:Name="UpravitTypPicker" TextColor="#333333">
+                            <Picker.Items>
+                                <x:String>Výdaj</x:String>
+                                <x:String>Příjem</x:String>
+                            </Picker.Items>
+                        </Picker>
+                        <Picker Grid.Column="1" x:Name="UpravitKategoriePicker" TextColor="#333333" ItemDisplayBinding="{Binding Nazev}" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="15" Margin="0,15,0,0">
+                        <Button Grid.Column="0" Text="Zrušit" BackgroundColor="#E2E3E5" TextColor="#333333" Clicked="OnZrusitUpravuClicked" CornerRadius="8" FontAttributes="Bold"/>
+                        <Button Grid.Column="1" Text="Uložit" BackgroundColor="#0056B3" TextColor="White" Clicked="OnUlozitUpravuClicked" FontAttributes="Bold" CornerRadius="8" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+    </Grid>
 </ContentPage>
