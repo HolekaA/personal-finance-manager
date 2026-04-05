@@ -1,0 +1,107 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="osobniSpravceFinanci.KategoriePage"
+             BackgroundColor="#F5F7FA"
+             Title="Kategorie"
+             Shell.NavBarIsVisible="False">
+
+    <Grid>
+
+        <Grid RowDefinitions="Auto, *" Padding="20">
+
+            <Border Grid.Row="0" Padding="15" StrokeShape="RoundRectangle 10" Stroke="LightGray" BackgroundColor="White" Margin="0,0,0,20">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Přidat novou kategorii" FontSize="18" FontAttributes="Bold" TextColor="#0056B3" />
+                    <Label x:Name="ChybaLabel" TextColor="#DC3545" FontSize="14" IsVisible="False" FontAttributes="Italic" />
+
+                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                        <Entry Grid.Column="0" x:Name="NazevEntry" Placeholder="Název (např. Jídlo)" TextColor="#333333" TextChanged="OnNazevZmenen" />
+                        <Button Grid.Column="1" Text="Přidat" BackgroundColor="#28A745" TextColor="White" FontAttributes="Bold" CornerRadius="8" Clicked="OnPridatClicked" />
+                    </Grid>
+
+                    <Label Text="Vyberte barvu:" FontSize="14" TextColor="#6C757D" Margin="0,5,0,0" />
+
+                    <FlexLayout x:Name="PaletaBarevLayout" Wrap="Wrap" JustifyContent="Start" AlignItems="Center">
+                        <Button BackgroundColor="#007AFF" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaZvolena" CommandParameter="#007AFF" BorderWidth="3" BorderColor="#333333" />
+                        <Button BackgroundColor="#FF3B30" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaZvolena" CommandParameter="#FF3B30" />
+                        <Button BackgroundColor="#FF9500" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaZvolena" CommandParameter="#FF9500" />
+                        <Button BackgroundColor="#FFCC00" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaZvolena" CommandParameter="#FFCC00" />
+                        <Button BackgroundColor="#34C759" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaZvolena" CommandParameter="#34C759" />
+                        <Button BackgroundColor="#00C7BE" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaZvolena" CommandParameter="#00C7BE" />
+                        <Button BackgroundColor="#5856D6" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaZvolena" CommandParameter="#5856D6" />
+                        <Button BackgroundColor="#AF52DE" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaZvolena" CommandParameter="#AF52DE" />
+                        <Button BackgroundColor="#FF2D55" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaZvolena" CommandParameter="#FF2D55" />
+                        <Button BackgroundColor="#A2845E" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaZvolena" CommandParameter="#A2845E" />
+                        <Button BackgroundColor="#8E8E93" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaZvolena" CommandParameter="#8E8E93" />
+                        <Button BackgroundColor="#000000" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaZvolena" CommandParameter="#000000" />
+                    </FlexLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <CollectionView Grid.Row="1" x:Name="KategorieList">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,0,0,10" Padding="15" StrokeShape="RoundRectangle 10" Stroke="LightGray" BackgroundColor="White">
+                            <Grid ColumnDefinitions="*, Auto, Auto">
+                                <HorizontalStackLayout Grid.Column="0" Spacing="10" VerticalOptions="Center">
+                                    <BoxView Color="{Binding Barva}" WidthRequest="15" HeightRequest="15" CornerRadius="7.5" VerticalOptions="Center"/>
+                                    <Label Text="{Binding Nazev}" FontSize="18" FontAttributes="Bold" TextColor="#333333" VerticalOptions="Center"/>
+                                </HorizontalStackLayout>
+                                <Button Grid.Column="1" Text="✎" CommandParameter="{Binding .}" Clicked="OnUpravitClicked" BackgroundColor="Transparent" TextColor="#0056B3" FontSize="20" WidthRequest="40" Padding="0"/>
+                                <Button Grid.Column="2" Text="🗑" CommandParameter="{Binding .}" Clicked="OnSmazatClicked" BackgroundColor="Transparent" TextColor="#DC3545" FontSize="20" WidthRequest="40" Padding="0"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </Grid>
+
+
+        <Grid x:Name="SmazatOverlay" BackgroundColor="#80000000" IsVisible="False" ZIndex="10">
+            <Border VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="320" Padding="25" StrokeShape="RoundRectangle 15" BackgroundColor="White">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Smazat kategorii" FontSize="20" FontAttributes="Bold" TextColor="#333333" HorizontalOptions="Center"/>
+                    <Label x:Name="SmazatTextLabel" Text="Opravdu chcete smazat tuto kategorii?" TextColor="#6C757D" HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="15" Margin="0,15,0,0">
+                        <Button Grid.Column="0" Text="Zrušit" BackgroundColor="#E2E3E5" TextColor="#333333" Clicked="OnZrusitSmazaniClicked" CornerRadius="8" FontAttributes="Bold"/>
+                        <Button Grid.Column="1" Text="Smazat" BackgroundColor="#DC3545" TextColor="White" Clicked="OnPotvrditSmazaniClicked" FontAttributes="Bold" CornerRadius="8" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <Grid x:Name="UpravitOverlay" BackgroundColor="#80000000" IsVisible="False" ZIndex="10">
+            <Border VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="320" Padding="25" StrokeShape="RoundRectangle 15" BackgroundColor="White">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Upravit kategorii" FontSize="20" FontAttributes="Bold" TextColor="#333333" HorizontalOptions="Center"/>
+                    
+                    <Label Text="Název:" TextColor="#6C757D" FontSize="14" Margin="0,0,0,-10"/>
+                    <Entry x:Name="UpravitNazevEntry" TextColor="#333333" />
+
+                    <Label Text="Barva:" TextColor="#6C757D" FontSize="14" Margin="0,0,0,-5"/>
+                    <FlexLayout x:Name="PaletaBarevUpravaLayout" Wrap="Wrap" JustifyContent="Start" AlignItems="Center">
+                        <Button BackgroundColor="#FF3B30" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaUpravaZvolena" CommandParameter="#FF3B30" />
+                        <Button BackgroundColor="#FF9500" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaUpravaZvolena" CommandParameter="#FF9500" />
+                        <Button BackgroundColor="#FFCC00" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaUpravaZvolena" CommandParameter="#FFCC00" />
+                        <Button BackgroundColor="#34C759" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaUpravaZvolena" CommandParameter="#34C759" />
+                        <Button BackgroundColor="#00C7BE" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaUpravaZvolena" CommandParameter="#00C7BE" />
+                        <Button BackgroundColor="#007AFF" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaUpravaZvolena" CommandParameter="#007AFF" />
+                        <Button BackgroundColor="#5856D6" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaUpravaZvolena" CommandParameter="#5856D6" />
+                        <Button BackgroundColor="#AF52DE" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaUpravaZvolena" CommandParameter="#AF52DE" />
+                        <Button BackgroundColor="#FF2D55" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaUpravaZvolena" CommandParameter="#FF2D55" />
+                        <Button BackgroundColor="#A2845E" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaUpravaZvolena" CommandParameter="#A2845E" />
+                        <Button BackgroundColor="#8E8E93" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaUpravaZvolena" CommandParameter="#8E8E93" />
+                        <Button BackgroundColor="#000000" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaUpravaZvolena" CommandParameter="#000000" />
+                    </FlexLayout>
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="15" Margin="0,5,0,0">
+                        <Button Grid.Column="0" Text="Zrušit" BackgroundColor="#E2E3E5" TextColor="#333333" Clicked="OnZrusitUpravuClicked" CornerRadius="8" FontAttributes="Bold"/>
+                        <Button Grid.Column="1" Text="Uložit" BackgroundColor="#0056B3" TextColor="White" Clicked="OnUlozitUpravuClicked" FontAttributes="Bold" CornerRadius="8" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+    </Grid>
+</ContentPage>

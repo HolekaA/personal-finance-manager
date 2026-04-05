@@ -1,14 +1,34 @@
-<?xml version="1.0" encoding="UTF-8" ?>
 <Shell
     x:Class="osobniSpravceFinanci.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:osobniSpravceFinanci"
-    Title="osobniSpravceFinanci">
+    Shell.FlyoutBehavior="Disabled"
+    Title="Osobní správce financí">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <Shell.Resources>
+        <ResourceDictionary>
+            <Style TargetType="TabBar">
+                <Setter Property="Shell.TabBarBackgroundColor" Value="#F8F9FA" />
+                <Setter Property="Shell.TabBarTitleColor" Value="#0056B3" />
+                <Setter Property="Shell.TabBarUnselectedColor" Value="#6C757D" />
+            </Style>
+        </ResourceDictionary>
+    </Shell.Resources>
+
+    <TabBar>
+        <Tab Title="Přehled" Route="MainPage">
+            <ShellContent ContentTemplate="{DataTemplate local:MainPage}" />
+        </Tab>
+        <Tab Title="Kategorie" Route="KategoriePage">
+            <ShellContent ContentTemplate="{DataTemplate local:KategoriePage}" />
+        </Tab>
+        <Tab Title="Šablony" Route="SablonyPage">
+            <ShellContent ContentTemplate="{DataTemplate local:SablonyPage}" />
+        </Tab>
+        <Tab Title="Spořicí cíle" Route="CilePage">
+            <ShellContent ContentTemplate="{DataTemplate local:CilePage}" />
+        </Tab>
+    </TabBar>
 
 </Shell>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using osobniSpravceFinanci.Services;
 
 namespace osobniSpravceFinanci
 {
@@ -15,8 +16,12 @@ namespace osobniSpravceFinanci
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
+            builder.Services.AddSingleton<KategorieService>();
+            builder.Services.AddTransient<MainPage>();
+            builder.Services.AddTransient<KategoriePage>();
+
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();
