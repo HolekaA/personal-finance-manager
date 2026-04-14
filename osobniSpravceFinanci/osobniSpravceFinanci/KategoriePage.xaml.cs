@@ -28,7 +28,7 @@ namespace osobniSpravceFinanci
         private void ObnovitSeznam()
         {
             var data = _kategorieService.GetAktivniKategorie();
-            KategorieList.ItemsSource = data;
+            BindableLayout.SetItemsSource(KategorieList, data);
         }
 
         private void OnNazevZmenen(object sender, TextChangedEventArgs e)

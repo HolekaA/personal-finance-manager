@@ -42,6 +42,7 @@ namespace osobniSpravceFinanci.Models
         public string Nazev { get; set; } = "";
         public decimal CilovaCastka { get; set; }
         public DateTime DatumVytvoreni { get; set; }
+        public bool JeAktivni { get; set; } = true;
     }
 
     public class VkladNaCil

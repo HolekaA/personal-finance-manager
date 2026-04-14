@@ -17,6 +17,7 @@ namespace osobniSpravceFinanci
         private SporiciCil? _cilKUprave;
         private SporiciCil? _cilProVklad;
         private SporiciCil? _cilProVyber;
+        private SporiciCil? _cilKeKoupi;
 
         public CilePage(CileService cileService, TransakceService transakceService, KategorieService kategorieService)
         {
@@ -31,8 +32,6 @@ namespace osobniSpravceFinanci
             base.OnAppearing();
 
             _dostupneKategorie = _kategorieService.GetAktivniKategorie();
-            VkladKategoriePicker.ItemsSource = _dostupneKategorie;
-            VyberKategoriePicker.ItemsSource = _dostupneKategorie;
 
             ObnovitSeznam();
         }
@@ -53,7 +52,7 @@ namespace osobniSpravceFinanci
                 });
             }
 
-            CileList.ItemsSource = seznamZobrazeni;
+            BindableLayout.SetItemsSource(CileList, seznamZobrazeni);
         }
 
         private void OnVstupZmenen(object sender, EventArgs e)
@@ -98,6 +97,36 @@ namespace osobniSpravceFinanci
             ObnovitSeznam();
         }
 
+        // koupeni cile
+        private void OnKoupitClicked(object sender, EventArgs e)
+        {
+            var tlacitko = (Button)sender;
+            _cilKeKoupi = (SporiciCil)tlacitko.CommandParameter;
+
+            KoupitTextLabel.Text = $"Gratulujeme k naspoření! Opravdu jste '{_cilKeKoupi.Nazev}' zakoupili? Cíl bude skryt z aktivních cílů.";
+            KoupitOverlay.IsVisible = true;
+        }
+
+        private void OnZrusitKoupiClicked(object sender, EventArgs e)
+        {
+            KoupitOverlay.IsVisible = false;
+            _cilKeKoupi = null;
+        }
+
+        private void OnPotvrditKoupiClicked(object sender, EventArgs e)
+        {
+            if (_cilKeKoupi != null)
+            {
+                _cilKeKoupi.JeAktivni = false;
+
+                _cileService.UpravitCil(_cilKeKoupi);
+
+                ObnovitSeznam();
+                KoupitOverlay.IsVisible = false;
+                _cilKeKoupi = null;
+            }
+        }
+
         // vlozeni vkladu
         private void OnOtevritVkladClicked(object sender, EventArgs e)
         {
@@ -106,9 +135,6 @@ namespace osobniSpravceFinanci
 
             VkladCilNazevLabel.Text = _cilProVklad.Nazev;
             VkladCastkaEntry.Text = "";
-
-            if (_dostupneKategorie.Count > 0)
-                VkladKategoriePicker.SelectedIndex = 0;
 
             VkladOverlay.IsVisible = true;
         }
@@ -130,14 +156,7 @@ namespace osobniSpravceFinanci
                 return;
             }
 
-            if (VkladKategoriePicker.SelectedItem == null)
-            {
-                VkladChybaLabel.Text = "Vyberte kategorii výdaje!";
-                VkladChybaLabel.IsVisible = true;
-                return;
-            }
-
-            var vybranaKat = (Kategorie)VkladKategoriePicker.SelectedItem;
+            var vybranaKat = _kategorieService.GetKategorieSporeni();
 
             var novaTransakce = new Transakce
             {
@@ -179,9 +198,6 @@ namespace osobniSpravceFinanci
             VyberCilNazevLabel.Text = _cilProVyber.Nazev;
             VyberCastkaEntry.Text = "";
 
-            if (_dostupneKategorie.Count > 0)
-                VyberKategoriePicker.SelectedIndex = 0;
-
             VyberOverlay.IsVisible = true;
         }
 
@@ -210,14 +226,7 @@ namespace osobniSpravceFinanci
                 return;
             }
 
-            if (VyberKategoriePicker.SelectedItem == null)
-            {
-                VyberChybaLabel.Text = "Vyberte kategorii!";
-                VyberChybaLabel.IsVisible = true;
-                return;
-            }
-
-            var vybranaKat = (Kategorie)VyberKategoriePicker.SelectedItem;
+            var vybranaKat = _kategorieService.GetKategorieSporeni();
 
             var novaTransakce = new Transakce
             {

@@ -8,9 +8,11 @@
     <Grid>
         <Label Grid.Row="0" Text="💡 Poznámka: Nově vytvořené šablony se do rozpočtu automaticky propíší vždy až první den následujícího měsíce." 
 TextColor="#6C757D" FontSize="12" FontAttributes="Italic" Margin="20,0,0,15" HorizontalTextAlignment="Start" />
-        <Grid RowDefinitions="Auto, *" Padding="20">
 
-            <Border Grid.Row="0" Padding="15" StrokeShape="RoundRectangle 10" Stroke="LightGray" BackgroundColor="White" Margin="0,0,0,20">
+        <ScrollView>
+            <VerticalStackLayout Padding="20" Spacing="20">
+
+                <Border Grid.Row="0" Padding="15" StrokeShape="RoundRectangle 10" Stroke="LightGray" BackgroundColor="White" Margin="0,0,0,20">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Přidat novou šablonu" FontSize="18" FontAttributes="Bold" TextColor="#0056B3" />
                     <Label x:Name="ChybaLabel" TextColor="#DC3545" FontSize="14" IsVisible="False" FontAttributes="Italic" />
@@ -35,30 +37,32 @@ TextColor="#6C757D" FontSize="12" FontAttributes="Italic" Margin="20,0,0,15" Hor
                 </VerticalStackLayout>
             </Border>
 
-            <CollectionView Grid.Row="1" x:Name="SablonyList">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Border Margin="0,0,0,10" Padding="15" StrokeShape="RoundRectangle 10" Stroke="LightGray" BackgroundColor="White">
-                            <Grid ColumnDefinitions="*, Auto, Auto, Auto">
+                <VerticalStackLayout x:Name="SablonyList">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,0,0,10" Padding="15" StrokeShape="RoundRectangle 10" Stroke="LightGray" BackgroundColor="White">
+                                <Grid ColumnDefinitions="*, Auto, Auto, Auto">
 
-                                <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
-                                    <Label Text="{Binding Nazev}" FontSize="18" FontAttributes="Bold" TextColor="#333333"/>
-                                    <HorizontalStackLayout Spacing="5" Margin="0,2,0,0">
-                                        <BoxView Color="{Binding KategorieBarva}" WidthRequest="10" HeightRequest="10" CornerRadius="5" VerticalOptions="Center"/>
-                                        <Label Text="{Binding KategorieNazev}" FontSize="14" TextColor="#6C757D" VerticalOptions="Center"/>
-                                    </HorizontalStackLayout>
-                                </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                                        <Label Text="{Binding Nazev}" FontSize="18" FontAttributes="Bold" TextColor="#333333"/>
+                                        <HorizontalStackLayout Spacing="5" Margin="0,2,0,0">
+                                            <BoxView Color="{Binding KategorieBarva}" WidthRequest="10" HeightRequest="10" CornerRadius="5" VerticalOptions="Center"/>
+                                            <Label Text="{Binding KategorieNazev}" FontSize="14" TextColor="#6C757D" VerticalOptions="Center"/>
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
 
-                                <Label Grid.Column="1" Text="{Binding CastkaZobrazeni}" TextColor="{Binding BarvaTypu}" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" Margin="0,0,15,0"/>
+                                    <Label Grid.Column="1" Text="{Binding CastkaZobrazeni}" TextColor="{Binding BarvaTypu}" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" Margin="0,0,15,0"/>
 
-                                <Button Grid.Column="2" Text="✎" CommandParameter="{Binding SablonaPuvodni}" Clicked="OnUpravitClicked" BackgroundColor="Transparent" TextColor="#0056B3" FontSize="20" WidthRequest="40" Padding="0"/>
-                                <Button Grid.Column="3" Text="🗑" CommandParameter="{Binding SablonaPuvodni}" Clicked="OnSmazatClicked" BackgroundColor="Transparent" TextColor="#DC3545" FontSize="20" WidthRequest="40" Padding="0"/>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </Grid>
+                                    <Button Grid.Column="2" Text="✎" CommandParameter="{Binding SablonaPuvodni}" Clicked="OnUpravitClicked" BackgroundColor="Transparent" TextColor="#0056B3" FontSize="20" WidthRequest="40" Padding="0"/>
+                                    <Button Grid.Column="3" Text="🗑" CommandParameter="{Binding SablonaPuvodni}" Clicked="OnSmazatClicked" BackgroundColor="Transparent" TextColor="#DC3545" FontSize="20" WidthRequest="40" Padding="0"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+                
+            </VerticalStackLayout>
+        </ScrollView>
 
         <Grid x:Name="SmazatOverlay" BackgroundColor="#80000000" IsVisible="False" ZIndex="10">
             <Border VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="320" Padding="25" StrokeShape="RoundRectangle 15" BackgroundColor="White">

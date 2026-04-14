@@ -12,7 +12,7 @@ namespace osobniSpravceFinanci.Services
         {
             using (var db = new LiteDatabase(DatabaseContext.DbPath))
             {
-                return db.GetCollection<SporiciCil>("sporiciCile").FindAll().ToList();
+                return db.GetCollection<SporiciCil>("sporiciCile").Find(c => c.JeAktivni == true).ToList();
             }
         }
 

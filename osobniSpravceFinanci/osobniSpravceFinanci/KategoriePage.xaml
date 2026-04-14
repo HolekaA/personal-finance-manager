@@ -7,17 +7,16 @@
 
     <Grid>
 
-        <Grid RowDefinitions="Auto, *" Padding="20">
+        <ScrollView>
+            <VerticalStackLayout Padding="20" Spacing="20">
 
             <Border Grid.Row="0" Padding="15" StrokeShape="RoundRectangle 10" Stroke="LightGray" BackgroundColor="White" Margin="0,0,0,20">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Přidat novou kategorii" FontSize="18" FontAttributes="Bold" TextColor="#0056B3" />
                     <Label x:Name="ChybaLabel" TextColor="#DC3545" FontSize="14" IsVisible="False" FontAttributes="Italic" />
 
-                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
-                        <Entry Grid.Column="0" x:Name="NazevEntry" Placeholder="Název (např. Jídlo)" TextColor="#333333" TextChanged="OnNazevZmenen" />
-                        <Button Grid.Column="1" Text="Přidat" BackgroundColor="#28A745" TextColor="White" FontAttributes="Bold" CornerRadius="8" Clicked="OnPridatClicked" />
-                    </Grid>
+                    <Entry x:Name="NazevEntry" Placeholder="Název (např. Jídlo)" TextColor="#333333" TextChanged="OnNazevZmenen" />
+                    
 
                     <Label Text="Vyberte barvu:" FontSize="14" TextColor="#6C757D" Margin="0,5,0,0" />
 
@@ -35,27 +34,31 @@
                         <Button BackgroundColor="#8E8E93" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaZvolena" CommandParameter="#8E8E93" />
                         <Button BackgroundColor="#000000" WidthRequest="30" HeightRequest="30" CornerRadius="15" Margin="0,0,10,10" Clicked="OnBarvaZvolena" CommandParameter="#000000" />
                     </FlexLayout>
+
+                    <Button Text="Přidat" BackgroundColor="#28A745" TextColor="White" FontAttributes="Bold" CornerRadius="8" Clicked="OnPridatClicked" Margin="0,10,0,0" />
+                    
                 </VerticalStackLayout>
             </Border>
 
-            <CollectionView Grid.Row="1" x:Name="KategorieList">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Border Margin="0,0,0,10" Padding="15" StrokeShape="RoundRectangle 10" Stroke="LightGray" BackgroundColor="White">
-                            <Grid ColumnDefinitions="*, Auto, Auto">
-                                <HorizontalStackLayout Grid.Column="0" Spacing="10" VerticalOptions="Center">
-                                    <BoxView Color="{Binding Barva}" WidthRequest="15" HeightRequest="15" CornerRadius="7.5" VerticalOptions="Center"/>
-                                    <Label Text="{Binding Nazev}" FontSize="18" FontAttributes="Bold" TextColor="#333333" VerticalOptions="Center"/>
-                                </HorizontalStackLayout>
-                                <Button Grid.Column="1" Text="✎" CommandParameter="{Binding .}" Clicked="OnUpravitClicked" BackgroundColor="Transparent" TextColor="#0056B3" FontSize="20" WidthRequest="40" Padding="0"/>
-                                <Button Grid.Column="2" Text="🗑" CommandParameter="{Binding .}" Clicked="OnSmazatClicked" BackgroundColor="Transparent" TextColor="#DC3545" FontSize="20" WidthRequest="40" Padding="0"/>
-                            </Grid>
-                        </Border>
+                <VerticalStackLayout x:Name="KategorieList">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,0,0,10" Padding="15" StrokeShape="RoundRectangle 10" Stroke="LightGray" BackgroundColor="White">
+                                <Grid ColumnDefinitions="*, Auto, Auto">
+                                    <HorizontalStackLayout Grid.Column="0" Spacing="10" VerticalOptions="Center">
+                                        <BoxView Color="{Binding Barva}" WidthRequest="15" HeightRequest="15" CornerRadius="7.5" VerticalOptions="Center"/>
+                                        <Label Text="{Binding Nazev}" FontSize="18" FontAttributes="Bold" TextColor="#333333" VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                    <Button Grid.Column="1" Text="✎" CommandParameter="{Binding .}" Clicked="OnUpravitClicked" BackgroundColor="Transparent" TextColor="#0056B3" FontSize="20" WidthRequest="40" Padding="0"/>
+                                    <Button Grid.Column="2" Text="🗑" CommandParameter="{Binding .}" Clicked="OnSmazatClicked" BackgroundColor="Transparent" TextColor="#DC3545" FontSize="20" WidthRequest="40" Padding="0"/>
+                                </Grid>
+                            </Border>
                     </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
 
-        </Grid>
+            </VerticalStackLayout>
+        </ScrollView>
 
 
         <Grid x:Name="SmazatOverlay" BackgroundColor="#80000000" IsVisible="False" ZIndex="10">

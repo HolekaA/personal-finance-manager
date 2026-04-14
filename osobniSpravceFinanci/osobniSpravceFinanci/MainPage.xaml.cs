@@ -15,6 +15,7 @@ namespace osobniSpravceFinanci
         private readonly SablonyService _sablonyService;
 
         private List<Kategorie> _dostupneKategorie = new List<Kategorie>();
+        private List<Kategorie> _vsechnyKategorie = new List<Kategorie>();
         private DateTime _vybranyMesic = DateTime.Today;
 
         private Transakce? _transakceKeSmazani;
@@ -45,15 +46,12 @@ namespace osobniSpravceFinanci
         private void NacistKategorie()
         {
             _dostupneKategorie = _kategorieService.GetAktivniKategorie();
+            _vsechnyKategorie = _kategorieService.GetVsechnyKategorie();
 
             KategoriePicker.ItemsSource = _dostupneKategorie;
             UpravitKategoriePicker.ItemsSource = _dostupneKategorie;
 
             TypPicker.SelectedIndex = 0;
-            if (_dostupneKategorie.Count > 0)
-            {
-                KategoriePicker.SelectedIndex = 0;
-            }
         }
 
         private void ObnovitSeznam()
@@ -74,7 +72,7 @@ namespace osobniSpravceFinanci
 
             foreach (var transakce in transakceProTentoMesic)
             {
-                var kategorie = _dostupneKategorie.FirstOrDefault(k => k.Id == transakce.KategorieId);
+                var kategorie = _vsechnyKategorie.FirstOrDefault(k => k.Id == transakce.KategorieId);
 
                 seznamZobrazeni.Add(new TransakceZobrazeni
                 {
@@ -84,7 +82,7 @@ namespace osobniSpravceFinanci
                 });
             }
 
-            TransakceList.ItemsSource = seznamZobrazeni;
+            BindableLayout.SetItemsSource(TransakceList, seznamZobrazeni);
         }
 
         private void OnVstupZmenen(object sender, EventArgs e)
@@ -109,14 +107,17 @@ namespace osobniSpravceFinanci
                 return;
             }
 
-            if (KategoriePicker.SelectedItem == null)
+            Kategorie zvolenaKategorie;
+
+            if (KategoriePicker.SelectedItem != null)
             {
-                ChybaLabel.Text = "Musíte vybrat kategorii!";
-                ChybaLabel.IsVisible = true;
-                return;
+                zvolenaKategorie = (Kategorie)KategoriePicker.SelectedItem;
+            }
+            else
+            {
+                zvolenaKategorie = _kategorieService.GetKategorieNeznama();
             }
 
-            var zvolenaKategorie = (Kategorie)KategoriePicker.SelectedItem;
             var zvolenyTyp = TypPicker.SelectedIndex == 0 ? TypTransakce.Vydaj : TypTransakce.Prijem;
 
             var novaTransakce = new Transakce
@@ -134,7 +135,6 @@ namespace osobniSpravceFinanci
             NazevEntry.Text = "";
             CastkaEntry.Text = "";
             TypPicker.SelectedIndex = 0;
-            if (_dostupneKategorie.Count > 0) KategoriePicker.SelectedIndex = 0;
             DatumPicker.Date = DateTime.Today;
 
             ObnovitSeznam();
@@ -169,6 +169,10 @@ namespace osobniSpravceFinanci
         }
 
         // uprava
+        private void OnUpravitVstupZmenen(object sender, EventArgs e)
+        {
+            UpravitChybaLabel.IsVisible = false;
+        }
         private void OnUpravitClicked(object sender, EventArgs e)
         {
             var tlacitko = (Button)sender;
@@ -181,6 +185,7 @@ namespace osobniSpravceFinanci
 
             UpravitKategoriePicker.SelectedItem = _dostupneKategorie.FirstOrDefault(k => k.Id == _transakceKUprave.KategorieId);
 
+            UpravitChybaLabel.IsVisible = false;
             UpravitOverlay.IsVisible = true;
         }
 
@@ -193,10 +198,18 @@ namespace osobniSpravceFinanci
         private void OnUlozitUpravuClicked(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(UpravitNazevEntry.Text) || string.IsNullOrWhiteSpace(UpravitCastkaEntry.Text))
+            {
+                UpravitChybaLabel.Text = "Vyplňte prosím název i částku!";
+                UpravitChybaLabel.IsVisible = true;
                 return;
+            }
 
             if (!decimal.TryParse(UpravitCastkaEntry.Text, out decimal castka) || castka <= 0)
+            {
+                UpravitChybaLabel.Text = "Částka musí být kladné číslo!";
+                UpravitChybaLabel.IsVisible = true;
                 return;
+            }
 
             if (_transakceKUprave != null)
             {
@@ -284,6 +297,8 @@ namespace osobniSpravceFinanci
         public string Nazev => TransakcePuvodni.Nazev;
         public string KategorieNazev { get; set; } = "";
         public string KategorieBarva { get; set; } = "";
+
+        public bool LzeUpravovat => KategorieNazev != "Spoření";
 
         public string DatumZobrazeni => TransakcePuvodni.Datum.ToString("dd.MM.yyyy");
 

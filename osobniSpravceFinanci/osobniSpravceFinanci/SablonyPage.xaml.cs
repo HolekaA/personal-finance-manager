@@ -62,7 +62,7 @@ namespace osobniSpravceFinanci
                 });
             }
 
-            SablonyList.ItemsSource = seznamZobrazeni;
+            BindableLayout.SetItemsSource(SablonyList, seznamZobrazeni);
         }
 
         private void OnVstupZmenen(object sender, EventArgs e)
