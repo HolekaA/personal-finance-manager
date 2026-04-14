@@ -6,6 +6,8 @@
              Shell.NavBarIsVisible="False">
 
     <Grid>
+        <Label Grid.Row="0" Text="💡 Poznámka: Nově vytvořené šablony se do rozpočtu automaticky propíší vždy až první den následujícího měsíce." 
+TextColor="#6C757D" FontSize="12" FontAttributes="Italic" Margin="20,0,0,15" HorizontalTextAlignment="Start" />
         <Grid RowDefinitions="Auto, *" Padding="20">
 
             <Border Grid.Row="0" Padding="15" StrokeShape="RoundRectangle 10" Stroke="LightGray" BackgroundColor="White" Margin="0,0,0,20">

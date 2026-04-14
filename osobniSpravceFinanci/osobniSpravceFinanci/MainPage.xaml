@@ -4,45 +4,121 @@
              BackgroundColor="#F5F7FA"
              Title="Přehled"
              Shell.NavBarIsVisible="False">
-    
-    <Grid RowDefinitions="Auto, Auto, *" Padding="20">
 
-        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="Center" Spacing="20" Margin="0,0,0,20">
-            <Button Text="&lt;" BackgroundColor="Transparent" TextColor="#0056B3" FontSize="20" FontAttributes="Bold" />
-            <Label Text="Duben 2026" FontSize="22" FontAttributes="Bold" TextColor="#333333" VerticalOptions="Center" />
-            <Button Text="&gt;" BackgroundColor="Transparent" TextColor="#0056B3" FontSize="20" FontAttributes="Bold" />
-        </HorizontalStackLayout>
+    <Grid>
+        <Grid RowDefinitions="Auto, Auto, Auto, *" Padding="20">
 
-        <HorizontalStackLayout Grid.Row="1" HorizontalOptions="End" Margin="0,0,0,15">
-            <Button Text="+ Přidat transakci" 
-                    BackgroundColor="#0056B3" 
-                    TextColor="White" 
-                    CornerRadius="8"
-                    FontAttributes="Bold"/>
-        </HorizontalStackLayout>
+            <Border Grid.Row="0" Padding="20" StrokeShape="RoundRectangle 15" BackgroundColor="#0056B3" StrokeThickness="0" Margin="0,0,0,20">
+                <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                    <Label Text="Aktuální zůstatek" TextColor="#B3D4FF" FontSize="14" HorizontalOptions="Center" />
+                    <Label x:Name="ZustatekLabel" Text="0 Kč" TextColor="White" FontSize="32" FontAttributes="Bold" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Border>
 
-        <CollectionView Grid.Row="2" x:Name="TransakceList">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Border Margin="0,0,0,10" Padding="15" StrokeShape="RoundRectangle 10" BackgroundColor="White">
+            <Border Grid.Row="1" Padding="15" StrokeShape="RoundRectangle 10" Stroke="LightGray" BackgroundColor="White" Margin="0,0,0,20">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Nová transakce" FontSize="16" FontAttributes="Bold" TextColor="#333333" />
+                    <Label x:Name="ChybaLabel" TextColor="#DC3545" FontSize="14" IsVisible="False" FontAttributes="Italic" />
 
-                        <Grid ColumnDefinitions="*, Auto, Auto, Auto">
-                            <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
-                                <Label Text="{Binding Nazev}" FontSize="18" FontAttributes="Bold" TextColor="#333333"/>
-                                <Label Text="{Binding Kategorie.Nazev, FallbackValue='Kategorie'}" FontSize="14" TextColor="#6C757D"/>
-                            </VerticalStackLayout>
+                    <Grid ColumnDefinitions="*, *" ColumnSpacing="10">
+                        <Entry Grid.Column="0" x:Name="NazevEntry" Placeholder="Za co to bylo?" TextColor="#333333" TextChanged="OnVstupZmenen" />
+                        <Entry Grid.Column="1" x:Name="CastkaEntry" Placeholder="Částka (Kč)" Keyboard="Numeric" TextColor="#333333" TextChanged="OnVstupZmenen" />
+                    </Grid>
 
-                            <Label Grid.Column="1" Text="{Binding Castka, StringFormat='{0} Kč'}" FontSize="18" FontAttributes="Bold" TextColor="#0056B3" VerticalOptions="Center" Margin="0,0,20,0"/>
+                    <Grid ColumnDefinitions="*, *, *" ColumnSpacing="10">
+                        <Picker Grid.Column="0" x:Name="TypPicker" TextColor="#333333" SelectedIndexChanged="OnVstupZmenen">
+                            <Picker.Items>
+                                <x:String>Výdaj</x:String>
+                                <x:String>Příjem</x:String>
+                            </Picker.Items>
+                        </Picker>
 
-                            <Button Grid.Column="2" Text="✎" BackgroundColor="Transparent" TextColor="#28A745" FontSize="20" WidthRequest="40" Padding="0"/>
+                        <Picker Grid.Column="1" x:Name="KategoriePicker" TextColor="#333333" ItemDisplayBinding="{Binding Nazev}" SelectedIndexChanged="OnVstupZmenen" />
 
-                            <Button Grid.Column="3" Text="🗑" BackgroundColor="Transparent" TextColor="#DC3545" FontSize="20" WidthRequest="40" Padding="0"/>
-                        </Grid>
+                        <DatePicker Grid.Column="2" x:Name="DatumPicker" TextColor="#333333" />
+                    </Grid>
 
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                    <Button Text="Přidat" BackgroundColor="#28A745" TextColor="White" FontAttributes="Bold" CornerRadius="8" Clicked="OnPridatClicked" Margin="0,5,0,0"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <Grid Grid.Row="2" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,15" VerticalOptions="Center">
+                <Button Grid.Column="0" Text="◀" BackgroundColor="Transparent" TextColor="#0056B3" FontSize="20" FontAttributes="Bold" Clicked="OnPredchoziMesicClicked" Padding="10,0"/>
+
+                <Label Grid.Column="1" x:Name="MesicLabel" Text="Duben 2026" FontSize="18" FontAttributes="Bold" TextColor="#333333" HorizontalOptions="Center" VerticalOptions="Center" />
+
+                <Button Grid.Column="2" Text="▶" BackgroundColor="Transparent" TextColor="#0056B3" FontSize="20" FontAttributes="Bold" Clicked="OnDalsiMesicClicked" Padding="10,0"/>
+            </Grid>
+
+            <CollectionView Grid.Row="3" x:Name="TransakceList">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,0,0,10" Padding="15" StrokeShape="RoundRectangle 10" Stroke="LightGray" BackgroundColor="White">
+                            <Grid ColumnDefinitions="*, Auto, Auto, Auto">
+
+                                <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                                    <Label Text="{Binding Nazev}" FontSize="16" FontAttributes="Bold" TextColor="#333333"/>
+                                    <HorizontalStackLayout Spacing="5" Margin="0,2,0,0">
+                                        <BoxView Color="{Binding KategorieBarva}" WidthRequest="10" HeightRequest="10" CornerRadius="5" VerticalOptions="Center"/>
+                                        <Label Text="{Binding KategorieNazev}" FontSize="12" TextColor="#6C757D" VerticalOptions="Center"/>
+                                        <Label Text="•" FontSize="12" TextColor="#6C757D" VerticalOptions="Center"/>
+                                        <Label Text="{Binding DatumZobrazeni}" FontSize="12" TextColor="#6C757D" VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+
+                                <Label Grid.Column="1" Text="{Binding CastkaZobrazeni}" TextColor="{Binding BarvaTypu}" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" Margin="0,0,15,0"/>
+
+                                <Button Grid.Column="2" Text="✎" CommandParameter="{Binding TransakcePuvodni}" Clicked="OnUpravitClicked" BackgroundColor="Transparent" TextColor="#0056B3" FontSize="20" WidthRequest="40" Padding="0"/>
+                                <Button Grid.Column="3" Text="🗑" CommandParameter="{Binding TransakcePuvodni}" Clicked="OnSmazatClicked" BackgroundColor="Transparent" TextColor="#DC3545" FontSize="20" WidthRequest="40" Padding="0"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <Grid x:Name="SmazatOverlay" BackgroundColor="#80000000" IsVisible="False" ZIndex="10">
+            <Border VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="320" Padding="25" StrokeShape="RoundRectangle 15" BackgroundColor="White">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Smazat transakci" FontSize="20" FontAttributes="Bold" TextColor="#333333" HorizontalOptions="Center"/>
+                    <Label x:Name="SmazatTextLabel" Text="Opravdu chcete smazat tuto platbu?" TextColor="#6C757D" HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="15" Margin="0,15,0,0">
+                        <Button Grid.Column="0" Text="Zrušit" BackgroundColor="#E2E3E5" TextColor="#333333" Clicked="OnZrusitSmazaniClicked" CornerRadius="8" FontAttributes="Bold"/>
+                        <Button Grid.Column="1" Text="Smazat" BackgroundColor="#DC3545" TextColor="White" Clicked="OnPotvrditSmazaniClicked" FontAttributes="Bold" CornerRadius="8" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <Grid x:Name="UpravitOverlay" BackgroundColor="#80000000" IsVisible="False" ZIndex="10">
+            <Border VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="320" Padding="25" StrokeShape="RoundRectangle 15" BackgroundColor="White">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Upravit transakci" FontSize="20" FontAttributes="Bold" TextColor="#333333" HorizontalOptions="Center" Margin="0,0,0,10"/>
+
+                    <Grid ColumnDefinitions="*, *" ColumnSpacing="10">
+                        <Entry Grid.Column="0" x:Name="UpravitNazevEntry" TextColor="#333333" Placeholder="Název" />
+                        <Entry Grid.Column="1" x:Name="UpravitCastkaEntry" Keyboard="Numeric" TextColor="#333333" Placeholder="Částka" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*, *" ColumnSpacing="10">
+                        <Picker Grid.Column="0" x:Name="UpravitTypPicker" TextColor="#333333">
+                            <Picker.Items>
+                                <x:String>Výdaj</x:String>
+                                <x:String>Příjem</x:String>
+                            </Picker.Items>
+                        </Picker>
+                        <Picker Grid.Column="1" x:Name="UpravitKategoriePicker" TextColor="#333333" ItemDisplayBinding="{Binding Nazev}" />
+                    </Grid>
+
+                    <DatePicker x:Name="UpravitDatumPicker" TextColor="#333333" Margin="0,5,0,0" />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="15" Margin="0,15,0,0">
+                        <Button Grid.Column="0" Text="Zrušit" BackgroundColor="#E2E3E5" TextColor="#333333" Clicked="OnZrusitUpravuClicked" CornerRadius="8" FontAttributes="Bold"/>
+                        <Button Grid.Column="1" Text="Uložit" BackgroundColor="#0056B3" TextColor="White" Clicked="OnUlozitUpravuClicked" FontAttributes="Bold" CornerRadius="8" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
     </Grid>
-
 </ContentPage>

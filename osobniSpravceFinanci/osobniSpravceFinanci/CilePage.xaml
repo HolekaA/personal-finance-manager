@@ -1,12 +1,134 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="osobniSpravceFinanci.CilePage"
-             Title="CilePage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             BackgroundColor="#F5F7FA"
+             Title="Spořicí cíle"
+             Shell.NavBarIsVisible="False">
+
+    <Grid>
+        <Grid RowDefinitions="Auto, *" Padding="20">
+
+            <Border Grid.Row="0" Padding="15" StrokeShape="RoundRectangle 10" Stroke="LightGray" BackgroundColor="White" Margin="0,0,0,20">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Vytvořit nový cíl" FontSize="18" FontAttributes="Bold" TextColor="#0056B3" />
+                    <Label x:Name="ChybaLabel" TextColor="#DC3545" FontSize="14" IsVisible="False" FontAttributes="Italic" />
+
+                    <Grid ColumnDefinitions="*, *" ColumnSpacing="10">
+                        <Entry Grid.Column="0" x:Name="NazevEntry" Placeholder="Název (např. Auto)" TextColor="#333333" TextChanged="OnVstupZmenen" />
+                        <Entry Grid.Column="1" x:Name="CilovaCastkaEntry" Placeholder="Cílová částka (Kč)" Keyboard="Numeric" TextColor="#333333" TextChanged="OnVstupZmenen" />
+                    </Grid>
+
+                    <Button Text="Přidat cíl" BackgroundColor="#28A745" TextColor="White" FontAttributes="Bold" CornerRadius="8" Clicked="OnPridatClicked" Margin="0,5,0,0"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <CollectionView Grid.Row="1" x:Name="CileList">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,0,0,15" Padding="15" StrokeShape="RoundRectangle 10" Stroke="LightGray" BackgroundColor="White">
+                            <VerticalStackLayout Spacing="10">
+
+                                <Grid ColumnDefinitions="*, Auto, Auto, Auto, Auto">
+                                    <Label Grid.Column="0" Text="{Binding Nazev}" FontSize="18" FontAttributes="Bold" TextColor="#333333" VerticalOptions="Center"/>
+
+                                    <Button Grid.Column="1" Text="➕ Vložit" CommandParameter="{Binding CilPuvodni}" Clicked="OnOtevritVkladClicked" BackgroundColor="#28A745" TextColor="White" CornerRadius="5" HeightRequest="35" Padding="10,0" Margin="0,0,5,0"/>
+
+                                    <Button Grid.Column="2" Text="➖ Odebrat" CommandParameter="{Binding CilPuvodni}" Clicked="OnOtevritVyberClicked" BackgroundColor="#FFC107" TextColor="#333333" CornerRadius="5" HeightRequest="35" Padding="10,0" Margin="0,0,10,0"/>
+
+                                    <Button Grid.Column="3" Text="✎" CommandParameter="{Binding CilPuvodni}" Clicked="OnUpravitClicked" BackgroundColor="Transparent" TextColor="#0056B3" FontSize="20" WidthRequest="40" Padding="0"/>
+                                    <Button Grid.Column="4" Text="🗑" CommandParameter="{Binding CilPuvodni}" Clicked="OnSmazatClicked" BackgroundColor="Transparent" TextColor="#DC3545" FontSize="20" WidthRequest="40" Padding="0"/>
+                                </Grid>
+
+                                <HorizontalStackLayout Spacing="5">
+                                    <Label Text="{Binding NaspornaCastka, StringFormat='{0} Kč'}" FontSize="16" FontAttributes="Bold" TextColor="#28A745"/>
+                                    <Label Text="z" FontSize="14" TextColor="#6C757D" VerticalOptions="Center"/>
+                                    <Label Text="{Binding CilovaCastka, StringFormat='{0} Kč'}" FontSize="14" TextColor="#6C757D" VerticalOptions="Center"/>
+                                </HorizontalStackLayout>
+
+                                <ProgressBar Progress="{Binding Procenta}" ProgressColor="{Binding BarvaPrubehu}" HeightRequest="10" />
+
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <Grid x:Name="SmazatOverlay" BackgroundColor="#80000000" IsVisible="False" ZIndex="10">
+            <Border VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="320" Padding="25" StrokeShape="RoundRectangle 15" BackgroundColor="White">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Smazat cíl" FontSize="20" FontAttributes="Bold" TextColor="#333333" HorizontalOptions="Center"/>
+                    <Label x:Name="SmazatTextLabel" Text="Opravdu chcete smazat tento cíl? Smažou se i všechny k němu vázané vklady!" TextColor="#6C757D" HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="15" Margin="0,15,0,0">
+                        <Button Grid.Column="0" Text="Zrušit" BackgroundColor="#E2E3E5" TextColor="#333333" Clicked="OnZrusitSmazaniClicked" CornerRadius="8" FontAttributes="Bold"/>
+                        <Button Grid.Column="1" Text="Smazat" BackgroundColor="#DC3545" TextColor="White" Clicked="OnPotvrditSmazaniClicked" FontAttributes="Bold" CornerRadius="8" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <Grid x:Name="UpravitOverlay" BackgroundColor="#80000000" IsVisible="False" ZIndex="10">
+            <Border VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="320" Padding="25" StrokeShape="RoundRectangle 15" BackgroundColor="White">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Upravit cíl" FontSize="20" FontAttributes="Bold" TextColor="#333333" HorizontalOptions="Center" Margin="0,0,0,10"/>
+
+                    <Label Text="Název:" TextColor="#6C757D" FontSize="14" Margin="0,0,0,-5"/>
+                    <Entry x:Name="UpravitNazevEntry" TextColor="#333333" />
+
+                    <Label Text="Cílová částka:" TextColor="#6C757D" FontSize="14" Margin="0,5,0,-5"/>
+                    <Entry x:Name="UpravitCastkaEntry" Keyboard="Numeric" TextColor="#333333" />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="15" Margin="0,15,0,0">
+                        <Button Grid.Column="0" Text="Zrušit" BackgroundColor="#E2E3E5" TextColor="#333333" Clicked="OnZrusitUpravuClicked" CornerRadius="8" FontAttributes="Bold"/>
+                        <Button Grid.Column="1" Text="Uložit" BackgroundColor="#0056B3" TextColor="White" Clicked="OnUlozitUpravuClicked" FontAttributes="Bold" CornerRadius="8" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <Grid x:Name="VkladOverlay" BackgroundColor="#80000000" IsVisible="False" ZIndex="10">
+            <Border VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="320" Padding="25" StrokeShape="RoundRectangle 15" BackgroundColor="White">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Vložit peníze na cíl" FontSize="20" FontAttributes="Bold" TextColor="#333333" HorizontalOptions="Center"/>
+                    <Label x:Name="VkladCilNazevLabel" Text="Název cíle" TextColor="#0056B3" FontAttributes="Bold" HorizontalOptions="Center" Margin="0,0,0,10"/>
+
+                    <Label x:Name="VkladChybaLabel" TextColor="#DC3545" FontSize="14" IsVisible="False" FontAttributes="Italic" />
+
+                    <Label Text="Zadejte částku (Kč):" TextColor="#6C757D" FontSize="14" Margin="0,0,0,-5"/>
+                    <Entry x:Name="VkladCastkaEntry" Keyboard="Numeric" TextColor="#333333" TextChanged="OnVkladVstupZmenen" />
+
+                    <Label Text="Kategorie výdaje:" TextColor="#6C757D" FontSize="14" Margin="0,5,0,-5"/>
+                    <Picker x:Name="VkladKategoriePicker" TextColor="#333333" ItemDisplayBinding="{Binding Nazev}" SelectedIndexChanged="OnVkladVstupZmenen" />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="15" Margin="0,15,0,0">
+                        <Button Grid.Column="0" Text="Zrušit" BackgroundColor="#E2E3E5" TextColor="#333333" Clicked="OnZrusitVkladClicked" CornerRadius="8" FontAttributes="Bold"/>
+                        <Button Grid.Column="1" Text="Vložit" BackgroundColor="#28A745" TextColor="White" Clicked="OnPotvrditVkladClicked" FontAttributes="Bold" CornerRadius="8" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <Grid x:Name="VyberOverlay" BackgroundColor="#80000000" IsVisible="False" ZIndex="10">
+            <Border VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="320" Padding="25" StrokeShape="RoundRectangle 15" BackgroundColor="White">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Odebrat peníze z cíle" FontSize="20" FontAttributes="Bold" TextColor="#333333" HorizontalOptions="Center"/>
+                    <Label x:Name="VyberCilNazevLabel" Text="Název cíle" TextColor="#FFC107" FontAttributes="Bold" HorizontalOptions="Center" Margin="0,0,0,10"/>
+
+                    <Label x:Name="VyberChybaLabel" TextColor="#DC3545" FontSize="14" IsVisible="False" FontAttributes="Italic" />
+
+                    <Label Text="Zadejte částku k výběru (Kč):" TextColor="#6C757D" FontSize="14" Margin="0,0,0,-5"/>
+                    <Entry x:Name="VyberCastkaEntry" Keyboard="Numeric" TextColor="#333333" TextChanged="OnVyberVstupZmenen" />
+
+                    <Label Text="Kategorie pro vrácení:" TextColor="#6C757D" FontSize="14" Margin="0,5,0,-5"/>
+                    <Picker x:Name="VyberKategoriePicker" TextColor="#333333" ItemDisplayBinding="{Binding Nazev}" SelectedIndexChanged="OnVyberVstupZmenen" />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="15" Margin="0,15,0,0">
+                        <Button Grid.Column="0" Text="Zrušit" BackgroundColor="#E2E3E5" TextColor="#333333" Clicked="OnZrusitVyberClicked" CornerRadius="8" FontAttributes="Bold"/>
+                        <Button Grid.Column="1" Text="Odebrat" BackgroundColor="#FFC107" TextColor="#333333" Clicked="OnPotvrditVyberClicked" FontAttributes="Bold" CornerRadius="8" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+    </Grid>
 </ContentPage>

@@ -28,7 +28,7 @@ namespace osobniSpravceFinanci.Models
     public class Transakce
     {
         public int Id { get; set; }
-        public string Nazev { get; set; }
+        public string Nazev { get; set; } = "";
         public decimal Castka { get; set; }
         public DateTime Datum { get; set; }
         public TypTransakce Typ { get; set; }
@@ -39,8 +39,9 @@ namespace osobniSpravceFinanci.Models
     public class SporiciCil
     {
         public int Id { get; set; }
-        public string Nazev { get; set; }
+        public string Nazev { get; set; } = "";
         public decimal CilovaCastka { get; set; }
+        public DateTime DatumVytvoreni { get; set; }
     }
 
     public class VkladNaCil
