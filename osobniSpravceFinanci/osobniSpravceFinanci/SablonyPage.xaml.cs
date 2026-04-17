@@ -14,6 +14,7 @@ namespace osobniSpravceFinanci
         private SablonaPlatby? _sablonaKUprave;
 
         private List<Kategorie> _dostupneKategorie = new List<Kategorie>();
+        private List<Kategorie> _vsechnyKategorie = new List<Kategorie>();
 
         public SablonyPage(SablonyService sablonyService, KategorieService kategorieService)
         {
@@ -33,16 +34,14 @@ namespace osobniSpravceFinanci
         private void NacistKategorieDoPickeru()
         {
             _dostupneKategorie = _kategorieService.GetAktivniKategorie();
+            _vsechnyKategorie = _kategorieService.GetVsechnyKategorie();
 
             KategoriePicker.ItemsSource = _dostupneKategorie;
             UpravitKategoriePicker.ItemsSource = _dostupneKategorie;
 
             TypPicker.SelectedIndex = 0;
 
-            if (_dostupneKategorie.Count > 0)
-            {
-                KategoriePicker.SelectedIndex = 0;
-            }
+            KategoriePicker.SelectedItem = null;
         }
 
         private void ObnovitSeznam()
@@ -52,7 +51,7 @@ namespace osobniSpravceFinanci
 
             foreach (var sablona in sablonyZDatabaze)
             {
-                var kategorie = _dostupneKategorie.FirstOrDefault(k => k.Id == sablona.KategorieId);
+                var kategorie = _vsechnyKategorie.FirstOrDefault(k => k.Id == sablona.KategorieId);
 
                 seznamZobrazeni.Add(new SablonaZobrazeni
                 {
@@ -74,8 +73,7 @@ namespace osobniSpravceFinanci
         {
             if (string.IsNullOrWhiteSpace(NazevEntry.Text) ||
                 string.IsNullOrWhiteSpace(CastkaEntry.Text) ||
-                TypPicker.SelectedIndex == -1 ||
-                KategoriePicker.SelectedItem == null)
+                TypPicker.SelectedIndex == -1)
             {
                 ChybaLabel.Text = "Vyplňte prosím všechna pole!";
                 ChybaLabel.IsVisible = true;
@@ -89,9 +87,18 @@ namespace osobniSpravceFinanci
                 return;
             }
 
-            // 0 = Výdaj, 1 = Příjem
+            // 0 - vydej, 1 - prijem
             var zvolenyTyp = TypPicker.SelectedIndex == 0 ? TypTransakce.Vydaj : TypTransakce.Prijem;
-            var zvolenaKategorie = (Kategorie)KategoriePicker.SelectedItem;
+
+            Kategorie zvolenaKategorie;
+            if (KategoriePicker.SelectedItem != null)
+            {
+                zvolenaKategorie = (Kategorie)KategoriePicker.SelectedItem;
+            }
+            else
+            {
+                zvolenaKategorie = _kategorieService.GetKategorieNeznama();
+            }
 
             var novaSablona = new SablonaPlatby
             {
@@ -107,10 +114,7 @@ namespace osobniSpravceFinanci
             CastkaEntry.Text = "";
             TypPicker.SelectedIndex = 0;
 
-            if (_dostupneKategorie.Count > 0)
-            {
-                KategoriePicker.SelectedIndex = 0;
-            }
+            KategoriePicker.SelectedItem = null;
 
             ObnovitSeznam();
         }

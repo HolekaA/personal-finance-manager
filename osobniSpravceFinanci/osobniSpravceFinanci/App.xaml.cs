@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using osobniSpravceFinanci.Services;
 
 namespace osobniSpravceFinanci
 {
@@ -7,6 +8,8 @@ namespace osobniSpravceFinanci
         public App()
         {
             InitializeComponent();
+
+            DatabaseSeeder.NaplnitTestovaciData();
         }
 
         protected override Window CreateWindow(IActivationState? activationState)

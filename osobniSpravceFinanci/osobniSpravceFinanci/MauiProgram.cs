@@ -24,6 +24,7 @@ namespace osobniSpravceFinanci
             builder.Services.AddTransient<SablonyPage>();
             builder.Services.AddSingleton<CileService>();
             builder.Services.AddTransient<CilePage>();
+            builder.Services.AddTransient<StatistikyPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

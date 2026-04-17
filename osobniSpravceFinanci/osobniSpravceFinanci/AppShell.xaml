@@ -29,6 +29,9 @@
         <Tab Title="Spořicí cíle" Route="CilePage">
             <ShellContent ContentTemplate="{DataTemplate local:CilePage}" />
         </Tab>
+        <Tab Title="Statistiky" Route="StatistikyPage">
+            <ShellContent ContentTemplate="{DataTemplate local:StatistikyPage}" />
+        </Tab>
     </TabBar>
 
 </Shell>

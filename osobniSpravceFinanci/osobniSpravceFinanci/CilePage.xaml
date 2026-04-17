@@ -98,7 +98,7 @@
                     <Label x:Name="VkladChybaLabel" TextColor="#DC3545" FontSize="14" IsVisible="False" FontAttributes="Italic" />
 
                     <Label Text="Zadejte částku (Kč):" TextColor="#6C757D" FontSize="14" Margin="0,0,0,-5"/>
-                    <Entry x:Name="VkladCastkaEntry" Keyboard="Numeric" TextColor="#333333" TextChanged="OnVkladVstupZmenen" />
+                    <Entry x:Name="VkladCastkaEntry" Placeholder="Částka (Kč)" Keyboard="Numeric" TextColor="#333333" TextChanged="OnVkladVstupZmenen" />
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="15" Margin="0,15,0,0">
                         <Button Grid.Column="0" Text="Zrušit" BackgroundColor="#E2E3E5" TextColor="#333333" Clicked="OnZrusitVkladClicked" CornerRadius="8" FontAttributes="Bold"/>
@@ -117,7 +117,7 @@
                     <Label x:Name="VyberChybaLabel" TextColor="#DC3545" FontSize="14" IsVisible="False" FontAttributes="Italic" />
 
                     <Label Text="Zadejte částku k výběru (Kč):" TextColor="#6C757D" FontSize="14" Margin="0,0,0,-5"/>
-                    <Entry x:Name="VyberCastkaEntry" Keyboard="Numeric" TextColor="#333333" TextChanged="OnVyberVstupZmenen" />
+                    <Entry x:Name="VyberCastkaEntry" Placeholder="Částka (Kč)" Keyboard="Numeric" TextColor="#333333" TextChanged="OnVyberVstupZmenen" />
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="15" Margin="0,15,0,0">
                         <Button Grid.Column="0" Text="Zrušit" BackgroundColor="#E2E3E5" TextColor="#333333" Clicked="OnZrusitVyberClicked" CornerRadius="8" FontAttributes="Bold"/>

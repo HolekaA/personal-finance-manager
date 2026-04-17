@@ -27,14 +27,14 @@
                     </Grid>
 
                     <Grid ColumnDefinitions="*, *, *" ColumnSpacing="10">
-                        <Picker Grid.Column="0" x:Name="TypPicker" Title="Vyberte typ" TextColor="#333333" SelectedIndexChanged="OnVstupZmenen">
+                            <Picker Grid.Column="0" x:Name="TypPicker" Title="Vyberte typ" TitleColor="#6C757D" TextColor="#333333" SelectedIndexChanged="OnVstupZmenen">
                             <Picker.Items>
                                 <x:String>Výdaj</x:String>
                                 <x:String>Příjem</x:String>
                             </Picker.Items>
                         </Picker>
 
-                        <Picker Grid.Column="1" x:Name="KategoriePicker" Title="Vyberte kategorii" TextColor="#333333" ItemDisplayBinding="{Binding Nazev}" SelectedIndexChanged="OnVstupZmenen" />
+                        <Picker Grid.Column="1" x:Name="KategoriePicker" Title="Vyberte kategorii" TitleColor="#6C757D" TextColor="#333333" ItemDisplayBinding="{Binding Nazev}" SelectedIndexChanged="OnVstupZmenen" />
 
                         <DatePicker Grid.Column="2" x:Name="DatumPicker" TextColor="#333333" />
                     </Grid>
@@ -106,13 +106,13 @@
                     </Grid>
 
                     <Grid ColumnDefinitions="*, *" ColumnSpacing="10">
-                        <Picker Grid.Column="0" x:Name="UpravitTypPicker" TextColor="#333333">
+                        <Picker Grid.Column="0" x:Name="UpravitTypPicker" Title="Typ:" TitleColor="#6C757D" TextColor="#333333">
                             <Picker.Items>
                                 <x:String>Výdaj</x:String>
                                 <x:String>Příjem</x:String>
                             </Picker.Items>
                         </Picker>
-                        <Picker Grid.Column="1" x:Name="UpravitKategoriePicker" TextColor="#333333" ItemDisplayBinding="{Binding Nazev}" />
+                        <Picker Grid.Column="1" x:Name="UpravitKategoriePicker" Title="Kategorie:" TitleColor="#6C757D" TextColor="#333333" ItemDisplayBinding="{Binding Nazev}" />
                     </Grid>
 
                     <DatePicker x:Name="UpravitDatumPicker" TextColor="#333333" Margin="0,5,0,0" />
