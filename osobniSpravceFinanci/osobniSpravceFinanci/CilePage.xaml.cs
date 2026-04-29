@@ -11,14 +11,14 @@ namespace osobniSpravceFinanci
         private readonly TransakceService _transakceService;
         private readonly KategorieService _kategorieService;
 
-        private List<Kategorie> _dostupneKategorie = new List<Kategorie>();
-
+        // pomocne promenne
         private SporiciCil? _cilKeSmazani;
         private SporiciCil? _cilKUprave;
         private SporiciCil? _cilProVklad;
         private SporiciCil? _cilProVyber;
         private SporiciCil? _cilKeKoupi;
 
+        // konstruktor
         public CilePage(CileService cileService, TransakceService transakceService, KategorieService kategorieService)
         {
             InitializeComponent();
@@ -27,15 +27,15 @@ namespace osobniSpravceFinanci
             _kategorieService = kategorieService;
         }
 
+        // po zapnuti stranky
         protected override void OnAppearing()
         {
             base.OnAppearing();
 
-            _dostupneKategorie = _kategorieService.GetAktivniKategorie();
-
             ObnovitSeznam();
         }
 
+        // nacte cile a vypocita jejich stav
         private void ObnovitSeznam()
         {
             var cileZDatabaze = _cileService.GetVsechnyCile();
@@ -43,8 +43,10 @@ namespace osobniSpravceFinanci
 
             foreach (var cil in cileZDatabaze)
             {
+                // soucet vkladu
                 var nasporeno = _cileService.GetNaspornaCastka(cil.Id);
 
+                // priprava pro zobrazeni
                 seznamZobrazeni.Add(new CilZobrazeni
                 {
                     CilPuvodni = cil,
@@ -52,9 +54,11 @@ namespace osobniSpravceFinanci
                 });
             }
 
+            // poslani dat do gui
             BindableLayout.SetItemsSource(CileList, seznamZobrazeni);
         }
 
+        // skryti chybove hlasky
         private void OnVstupZmenen(object sender, EventArgs e)
         {
             ChybaLabel.IsVisible = false;
@@ -68,6 +72,7 @@ namespace osobniSpravceFinanci
         // pridani cile
         private void OnPridatClicked(object sender, EventArgs e)
         {
+            // kontrola inputu
             if (string.IsNullOrWhiteSpace(NazevEntry.Text) || string.IsNullOrWhiteSpace(CilovaCastkaEntry.Text))
             {
                 ChybaLabel.Text = "Vyplňte název i částku!";
@@ -75,6 +80,7 @@ namespace osobniSpravceFinanci
                 return;
             }
 
+            // kontrola castky
             if (!decimal.TryParse(CilovaCastkaEntry.Text, out decimal castka) || castka <= 0)
             {
                 ChybaLabel.Text = "Částka musí být číslo větší než nula!";
@@ -82,6 +88,7 @@ namespace osobniSpravceFinanci
                 return;
             }
 
+            // ulozeni cile
             var novyCil = new SporiciCil
             {
                 Nazev = NazevEntry.Text,
@@ -91,13 +98,14 @@ namespace osobniSpravceFinanci
 
             _cileService.PridatCil(novyCil);
 
+            // reset inputu
             NazevEntry.Text = "";
             CilovaCastkaEntry.Text = "";
 
             ObnovitSeznam();
         }
 
-        // koupeni cile
+        // tlacitko koupeni cile
         private void OnKoupitClicked(object sender, EventArgs e)
         {
             var tlacitko = (Button)sender;
@@ -107,12 +115,14 @@ namespace osobniSpravceFinanci
             KoupitOverlay.IsVisible = true;
         }
 
+        // zruseni koupeni cile
         private void OnZrusitKoupiClicked(object sender, EventArgs e)
         {
             KoupitOverlay.IsVisible = false;
             _cilKeKoupi = null;
         }
 
+        // potvrzeni koupeni cile
         private void OnPotvrditKoupiClicked(object sender, EventArgs e)
         {
             if (_cilKeKoupi != null)
@@ -127,7 +137,7 @@ namespace osobniSpravceFinanci
             }
         }
 
-        // vlozeni vkladu
+        // vlozeni vkladu na cil
         private void OnOtevritVkladClicked(object sender, EventArgs e)
         {
             var tlacitko = (Button)sender;
@@ -139,12 +149,14 @@ namespace osobniSpravceFinanci
             VkladOverlay.IsVisible = true;
         }
 
+        // zruseni vkladu na cil
         private void OnZrusitVkladClicked(object sender, EventArgs e)
         {
             VkladOverlay.IsVisible = false;
             _cilProVklad = null;
         }
 
+        // potvrzeni vkladu na cil
         private void OnPotvrditVkladClicked(object sender, EventArgs e)
         {
             if (_cilProVklad == null) return;
@@ -156,8 +168,10 @@ namespace osobniSpravceFinanci
                 return;
             }
 
+            // nalezeni kategorie sporeni
             var vybranaKat = _kategorieService.GetKategorieSporeni();
 
+            // vytvoreni transakce pro vklad na cil
             var novaTransakce = new Transakce
             {
                 Nazev = $"Spoření: {_cilProVklad.Nazev}",
@@ -169,6 +183,7 @@ namespace osobniSpravceFinanci
 
             int idNoveTransakce = _transakceService.PridatTransakci(novaTransakce);
 
+            // vytvoreni zaznamu vkladu na cil
             var novyVklad = new VkladNaCil
             {
                 SporiciCilId = _cilProVklad.Id,
@@ -184,12 +199,13 @@ namespace osobniSpravceFinanci
             _cilProVklad = null;
         }
 
-        // odebrani vkladu
+        // skryti chybove hlasky u vyberu penez z cile
         private void OnVyberVstupZmenen(object sender, EventArgs e)
         {
             VyberChybaLabel.IsVisible = false;
         }
 
+        // vyber penez z cile
         private void OnOtevritVyberClicked(object sender, EventArgs e)
         {
             var tlacitko = (Button)sender;
@@ -201,12 +217,14 @@ namespace osobniSpravceFinanci
             VyberOverlay.IsVisible = true;
         }
 
+        // zruseni vyberu penez z cile
         private void OnZrusitVyberClicked(object sender, EventArgs e)
         {
             VyberOverlay.IsVisible = false;
             _cilProVyber = null;
         }
 
+        // potvrzeni vyberu pene z cile
         private void OnPotvrditVyberClicked(object sender, EventArgs e)
         {
             if (_cilProVyber == null) return;
@@ -218,6 +236,7 @@ namespace osobniSpravceFinanci
                 return;
             }
 
+            // kontrola zda v cili je dostatek penez k vyberu
             decimal aktualneNasporeno = _cileService.GetNaspornaCastka(_cilProVyber.Id);
             if (vyberCastka > aktualneNasporeno)
             {
@@ -226,8 +245,10 @@ namespace osobniSpravceFinanci
                 return;
             }
 
+            // nalezeni kategorie sporeni
             var vybranaKat = _kategorieService.GetKategorieSporeni();
 
+            // vytvoreni transakce pro vyber penez
             var novaTransakce = new Transakce
             {
                 Nazev = $"Výběr ze spoření: {_cilProVyber.Nazev}",
@@ -239,6 +260,7 @@ namespace osobniSpravceFinanci
 
             int idNoveTransakce = _transakceService.PridatTransakci(novaTransakce);
 
+            // ulozeni zaporneho vkladu na cil
             var novyVklad = new VkladNaCil
             {
                 SporiciCilId = _cilProVyber.Id,
@@ -264,17 +286,22 @@ namespace osobniSpravceFinanci
             SmazatOverlay.IsVisible = true;
         }
 
+        // zruseni smazani cile
         private void OnZrusitSmazaniClicked(object sender, EventArgs e)
         {
             SmazatOverlay.IsVisible = false;
             _cilKeSmazani = null;
         }
 
+        // potvrzeni smaani cile
         private void OnPotvrditSmazaniClicked(object sender, EventArgs e)
         {
             if (_cilKeSmazani != null)
             {
+                // nalezeni vkladu/vyberu patrici cili
                 var vklady = _cileService.GetVkladyProCil(_cilKeSmazani.Id);
+                
+                // smazani vsech transakci k tomuto cili
                 foreach (var vklad in vklady)
                 {
                     if (vklad.TransakceId.HasValue)
@@ -283,6 +310,7 @@ namespace osobniSpravceFinanci
                     }
                 }
 
+                // smazani cile
                 _cileService.SmazatCil(_cilKeSmazani.Id);
 
                 ObnovitSeznam();
@@ -291,7 +319,7 @@ namespace osobniSpravceFinanci
             }
         }
 
-        // uprava
+        // uprava cile 
         private void OnUpravitClicked(object sender, EventArgs e)
         {
             var tlacitko = (Button)sender;
@@ -303,12 +331,14 @@ namespace osobniSpravceFinanci
             UpravitOverlay.IsVisible = true;
         }
 
+        // zruseni upravy cile
         private void OnZrusitUpravuClicked(object sender, EventArgs e)
         {
             UpravitOverlay.IsVisible = false;
             _cilKUprave = null;
         }
 
+        // potvrzeni upravy cile
         private void OnUlozitUpravuClicked(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(UpravitNazevEntry.Text) || string.IsNullOrWhiteSpace(UpravitCastkaEntry.Text))
@@ -331,6 +361,7 @@ namespace osobniSpravceFinanci
         }
     }
 
+    // trida pro zobrazeni cilu a progress baru
     public class CilZobrazeni
     {
         public SporiciCil CilPuvodni { get; set; } = null!;
@@ -338,23 +369,26 @@ namespace osobniSpravceFinanci
         public decimal CilovaCastka => CilPuvodni.CilovaCastka;
         public decimal NaspornaCastka { get; set; }
 
+        // vypocet na kolik procent je splnen cil
         public double Procenta
         {
             get
             {
                 if (CilovaCastka == 0) return 0;
                 double procento = (double)(NaspornaCastka / CilovaCastka);
+                // kontrola proti preplneni cile
                 return procento > 1.0 ? 1.0 : procento;
             }
         }
 
+        // zmena barvy progress baru
         public string BarvaPrubehu
         {
             get
             {
-                if (Procenta >= 1.0) return "#28A745";
-                if (Procenta >= 0.5) return "#FFC107";
-                return "#007AFF";
+                if (Procenta >= 1.0) return "#28A745"; // 100%
+                if (Procenta >= 0.5) return "#FFC107"; // 50-99%
+                return "#007AFF"; // 0-49%
             }
         }
     }

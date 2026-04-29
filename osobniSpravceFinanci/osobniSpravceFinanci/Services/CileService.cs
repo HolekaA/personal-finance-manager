@@ -75,36 +75,6 @@ namespace osobniSpravceFinanci.Services
             }
         }
 
-        // Přidat do CileService.cs
-        public void UpravitVkladPodleTransakce(int transakceId, decimal novaCastka)
-        {
-            using (var db = new LiteDatabase(DatabaseContext.DbPath))
-            {
-                var kolekce = db.GetCollection<VkladNaCil>("vkladyNaCile");
-                var vklad = kolekce.FindOne(v => v.TransakceId == transakceId);
-
-                if (vklad != null)
-                {
-                    vklad.VlozenaCastka = novaCastka;
-                    kolekce.Update(vklad);
-                }
-            }
-        }
-
-        public void SmazatVkladPodleTransakce(int transakceId)
-        {
-            using (var db = new LiteDatabase(DatabaseContext.DbPath))
-            {
-                var kolekce = db.GetCollection<VkladNaCil>("vkladyNaCile");
-                var vklad = kolekce.FindOne(v => v.TransakceId == transakceId);
-
-                if (vklad != null)
-                {
-                    kolekce.Delete(vklad.Id);
-                }
-            }
-        }
-
         // soucet castek pro progress 
         public decimal GetNaspornaCastka(int idCile)
         {

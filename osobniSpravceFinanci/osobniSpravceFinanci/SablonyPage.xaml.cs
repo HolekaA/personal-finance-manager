@@ -10,12 +10,15 @@ namespace osobniSpravceFinanci
         private readonly SablonyService _sablonyService;
         private readonly KategorieService _kategorieService;
 
+        // pomocne promenne
         private SablonaPlatby? _sablonaKeSmazani;
         private SablonaPlatby? _sablonaKUprave;
 
+        // seznamy kateorii
         private List<Kategorie> _dostupneKategorie = new List<Kategorie>();
         private List<Kategorie> _vsechnyKategorie = new List<Kategorie>();
 
+        // konstruktor
         public SablonyPage(SablonyService sablonyService, KategorieService kategorieService)
         {
             InitializeComponent();
@@ -23,6 +26,7 @@ namespace osobniSpravceFinanci
             _kategorieService = kategorieService;
         }
 
+        // po zapnuti stranky
         protected override void OnAppearing()
         {
             base.OnAppearing();
@@ -31,6 +35,7 @@ namespace osobniSpravceFinanci
             ObnovitSeznam();
         }
 
+        // nacteni kategorii
         private void NacistKategorieDoPickeru()
         {
             _dostupneKategorie = _kategorieService.GetAktivniKategorie();
@@ -44,6 +49,7 @@ namespace osobniSpravceFinanci
             KategoriePicker.SelectedItem = null;
         }
 
+        // nacteni ulozenych sablon
         private void ObnovitSeznam()
         {
             var sablonyZDatabaze = _sablonyService.GetSablony();
@@ -51,8 +57,10 @@ namespace osobniSpravceFinanci
 
             foreach (var sablona in sablonyZDatabaze)
             {
+                // nalezeni kategorie k sablone
                 var kategorie = _vsechnyKategorie.FirstOrDefault(k => k.Id == sablona.KategorieId);
 
+                // prevedeni do tridy pro zobrazeni
                 seznamZobrazeni.Add(new SablonaZobrazeni
                 {
                     SablonaPuvodni = sablona,
@@ -61,16 +69,20 @@ namespace osobniSpravceFinanci
                 });
             }
 
+            // odeslani dat do gui
             BindableLayout.SetItemsSource(SablonyList, seznamZobrazeni);
         }
 
+        // skryti chybove hlasky
         private void OnVstupZmenen(object sender, EventArgs e)
         {
             ChybaLabel.IsVisible = false;
         }
 
+        // pridani sablony
         private void OnPridatClicked(object sender, EventArgs e)
         {
+            // kontrola inputu
             if (string.IsNullOrWhiteSpace(NazevEntry.Text) ||
                 string.IsNullOrWhiteSpace(CastkaEntry.Text) ||
                 TypPicker.SelectedIndex == -1)
@@ -80,6 +92,7 @@ namespace osobniSpravceFinanci
                 return;
             }
 
+            // kontrola castky
             if (!decimal.TryParse(CastkaEntry.Text, out decimal castka) || castka < 0)
             {
                 ChybaLabel.Text = "Částka musí být platné číslo!";
@@ -90,6 +103,7 @@ namespace osobniSpravceFinanci
             // 0 - vydej, 1 - prijem
             var zvolenyTyp = TypPicker.SelectedIndex == 0 ? TypTransakce.Vydaj : TypTransakce.Prijem;
 
+            // pri nevybrani kategorie -> neznama
             Kategorie zvolenaKategorie;
             if (KategoriePicker.SelectedItem != null)
             {
@@ -100,6 +114,7 @@ namespace osobniSpravceFinanci
                 zvolenaKategorie = _kategorieService.GetKategorieNeznama();
             }
 
+            // ulozeni sablony do databaze
             var novaSablona = new SablonaPlatby
             {
                 Nazev = NazevEntry.Text,
@@ -110,15 +125,16 @@ namespace osobniSpravceFinanci
 
             _sablonyService.PridatSablonu(novaSablona);
 
+            // reset inputu
             NazevEntry.Text = "";
             CastkaEntry.Text = "";
             TypPicker.SelectedIndex = 0;
-
             KategoriePicker.SelectedItem = null;
 
             ObnovitSeznam();
         }
 
+        // tlacitko smazani sablony
         private void OnSmazatClicked(object sender, EventArgs e)
         {
             var tlacitko = (Button)sender;
@@ -128,12 +144,14 @@ namespace osobniSpravceFinanci
             SmazatOverlay.IsVisible = true;
         }
 
+        // zruseni smazani sablony
         private void OnZrusitSmazaniClicked(object sender, EventArgs e)
         {
             SmazatOverlay.IsVisible = false;
             _sablonaKeSmazani = null;
         }
 
+        // potvrzeni smazani sablony
         private void OnPotvrditSmazaniClicked(object sender, EventArgs e)
         {
             if (_sablonaKeSmazani != null)
@@ -145,11 +163,13 @@ namespace osobniSpravceFinanci
             }
         }
 
+        // tlacitko upravy sablony
         private void OnUpravitClicked(object sender, EventArgs e)
         {
             var tlacitko = (Button)sender;
             _sablonaKUprave = (SablonaPlatby)tlacitko.CommandParameter;
 
+            // vyplneni inputu
             UpravitNazevEntry.Text = _sablonaKUprave.Nazev;
             UpravitCastkaEntry.Text = _sablonaKUprave.Castka.ToString();
             UpravitTypPicker.SelectedIndex = _sablonaKUprave.Typ == TypTransakce.Vydaj ? 0 : 1;
@@ -159,14 +179,17 @@ namespace osobniSpravceFinanci
             UpravitOverlay.IsVisible = true;
         }
 
+        // zruseni upravy sablony
         private void OnZrusitUpravuClicked(object sender, EventArgs e)
         {
             UpravitOverlay.IsVisible = false;
             _sablonaKUprave = null;
         }
 
+        // ulozeni upravy sablony
         private void OnUlozitUpravuClicked(object sender, EventArgs e)
         {
+            // kontrola inputu a castky
             if (string.IsNullOrWhiteSpace(UpravitNazevEntry.Text) || string.IsNullOrWhiteSpace(UpravitCastkaEntry.Text))
                 return;
 
@@ -175,6 +198,7 @@ namespace osobniSpravceFinanci
 
             if (_sablonaKUprave != null)
             {
+                // aktualizace dat
                 _sablonaKUprave.Nazev = UpravitNazevEntry.Text;
                 _sablonaKUprave.Castka = castka;
                 _sablonaKUprave.Typ = UpravitTypPicker.SelectedIndex == 0 ? TypTransakce.Vydaj : TypTransakce.Prijem;
@@ -184,6 +208,7 @@ namespace osobniSpravceFinanci
                     _sablonaKUprave.KategorieId = vybranaKat.Id;
                 }
 
+                // ulozeni do databaze a obnoveni
                 _sablonyService.UpravitSablonu(_sablonaKUprave);
                 ObnovitSeznam();
 
@@ -193,6 +218,7 @@ namespace osobniSpravceFinanci
         }
     }
 
+    // trida pro zobrazeni sablon
     public class SablonaZobrazeni
     {
         public SablonaPlatby SablonaPuvodni { get; set; } = null!;
@@ -201,6 +227,7 @@ namespace osobniSpravceFinanci
         public string KategorieNazev { get; set; } = "";
         public string KategorieBarva { get; set; } = "";
 
+        // naformatovani vzhledu castky
         public string CastkaZobrazeni => SablonaPuvodni.Typ == TypTransakce.Prijem
             ? $"+ {SablonaPuvodni.Castka} Kč"
             : $"- {SablonaPuvodni.Castka} Kč";

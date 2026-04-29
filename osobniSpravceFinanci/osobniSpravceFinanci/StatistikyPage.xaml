@@ -39,7 +39,7 @@
 
             <Border Padding="15" StrokeShape="RoundRectangle 10" Stroke="LightGray" BackgroundColor="White">
                 <HorizontalStackLayout VerticalOptions="Center">
-                    <Label Text="Bilance za období:" FontSize="16" TextColor="#6C757D" VerticalOptions="Center"/>
+                    <Label Text="Bilance za období:" Margin="0,0,5,0" FontSize="16" TextColor="#6C757D" VerticalOptions="Center"/>
                     <Label x:Name="BilanceLabel" Text="0 Kč" FontSize="20" FontAttributes="Bold" TextColor="#333333" VerticalOptions="Center"/>
                 </HorizontalStackLayout>
             </Border>

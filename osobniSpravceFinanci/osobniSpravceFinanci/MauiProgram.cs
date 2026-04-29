@@ -7,7 +7,7 @@ namespace osobniSpravceFinanci
     {
         public static MauiApp CreateMauiApp()
         {
-            var builder = MauiApp.CreateBuilder();
+            var builder = MauiApp.CreateBuilder(); 
             builder
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
@@ -16,13 +16,18 @@ namespace osobniSpravceFinanci
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-            builder.Services.AddTransient<MainPage>();
+            // reistrace sluzeb (napojeni na databazi)
+            // jedna instance ktera bezi po celou dobu
             builder.Services.AddSingleton<TransakceService>();
             builder.Services.AddSingleton<KategorieService>();
-            builder.Services.AddTransient<KategoriePage>();
             builder.Services.AddSingleton<SablonyService>();
-            builder.Services.AddTransient<SablonyPage>();
             builder.Services.AddSingleton<CileService>();
+
+            // registrace gui stranek
+            // vytvori se vzdy nova instance
+            builder.Services.AddTransient<MainPage>();
+            builder.Services.AddTransient<KategoriePage>();
+            builder.Services.AddTransient<SablonyPage>();
             builder.Services.AddTransient<CilePage>();
             builder.Services.AddTransient<StatistikyPage>();
 

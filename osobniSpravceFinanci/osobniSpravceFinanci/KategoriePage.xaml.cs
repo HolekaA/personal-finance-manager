@@ -9,38 +9,45 @@ namespace osobniSpravceFinanci
 
         private string _zvolenaBarva = "#007AFF";
 
+        // pomocne promenne 
         private Kategorie? _kategorieKeSmazani;
         private Kategorie? _kategorieKUprave;
         private string _zvolenaBarvaProUpravu = "";
 
+        // konstruktor
         public KategoriePage(KategorieService kategorieService)
         {
             InitializeComponent();
             _kategorieService = kategorieService;
         }
 
+        // po zapnuti stranky
         protected override void OnAppearing()
         {
             base.OnAppearing();
             ObnovitSeznam();
         }
 
+        // vytazeni aktivnich kategorii
         private void ObnovitSeznam()
         {
             var data = _kategorieService.GetAktivniKategorie();
             BindableLayout.SetItemsSource(KategorieList, data);
         }
 
+        // zmizeni chybove hlasky
         private void OnNazevZmenen(object sender, TextChangedEventArgs e)
         {
             ChybaLabel.IsVisible = false;
         }
 
+        // ovladani zvolene barvy
         private void OnBarvaZvolena(object sender, EventArgs e)
         {
             var kliknuteTlacitko = (Button)sender;
             _zvolenaBarva = kliknuteTlacitko.CommandParameter.ToString();
 
+            // reset ramecku
             foreach (var prvek in PaletaBarevLayout.Children)
             {
                 if (prvek is Button btn)
@@ -49,12 +56,15 @@ namespace osobniSpravceFinanci
                 }
             }
 
+            // pridani ramecku
             kliknuteTlacitko.BorderWidth = 3;
             kliknuteTlacitko.BorderColor = Color.Parse("#333333");
         }
 
+        // pridani kategorie 
         private void OnPridatClicked(object sender, EventArgs e)
         {
+            // chybova hlaska
             if (string.IsNullOrWhiteSpace(NazevEntry.Text))
             {
                 ChybaLabel.Text = "Název kategorie nesmí zůstat prázdný!";
@@ -62,6 +72,7 @@ namespace osobniSpravceFinanci
                 return;
             }
 
+            // zapis do databaze
             var novaKategorie = new Kategorie
             {
                 Nazev = NazevEntry.Text,
@@ -71,6 +82,7 @@ namespace osobniSpravceFinanci
 
             _kategorieService.PridatKategorii(novaKategorie);
 
+            // reset inputu
             NazevEntry.Text = "";
 
             _zvolenaBarva = "#007AFF";
@@ -88,9 +100,11 @@ namespace osobniSpravceFinanci
                 }
             }
 
+            // obnoveni seznamu kategorii
             ObnovitSeznam();
         }
 
+        // smazani kategorie
         private void OnSmazatClicked(object sender, EventArgs e)
         {
             var tlacitko = (Button)sender;
@@ -101,12 +115,14 @@ namespace osobniSpravceFinanci
             SmazatOverlay.IsVisible = true;
         }
 
+        // zruseni smazani kategorie
         private void OnZrusitSmazaniClicked(object sender, EventArgs e)
         {
             SmazatOverlay.IsVisible = false; 
             _kategorieKeSmazani = null;
         }
 
+        // potvrzeni smazani kategorie
         private void OnPotvrditSmazaniClicked(object sender, EventArgs e)
         {
             if (_kategorieKeSmazani != null)
@@ -119,14 +135,17 @@ namespace osobniSpravceFinanci
             }
         }
 
+        // uprava kategorie
         private void OnUpravitClicked(object sender, EventArgs e)
         {
             var tlacitko = (Button)sender;
             _kategorieKUprave = (Kategorie)tlacitko.CommandParameter;
 
+            // vyplneni okna daty
             UpravitNazevEntry.Text = _kategorieKUprave.Nazev;
             _zvolenaBarvaProUpravu = _kategorieKUprave.Barva;
 
+            // zvyrazneni spravne barvy
             foreach (var prvek in PaletaBarevUpravaLayout.Children)
             {
                 if (prvek is Button btn)
@@ -146,11 +165,13 @@ namespace osobniSpravceFinanci
             UpravitOverlay.IsVisible = true;
         }
 
+        // vyber nove barvy behem upravy
         private void OnBarvaUpravaZvolena(object sender, EventArgs e)
         {
             var kliknuteTlacitko = (Button)sender;
             _zvolenaBarvaProUpravu = kliknuteTlacitko.CommandParameter.ToString();
 
+            // reset ramecku
             foreach (var prvek in PaletaBarevUpravaLayout.Children)
             {
                 if (prvek is Button btn)
@@ -159,18 +180,22 @@ namespace osobniSpravceFinanci
                 }
             }
 
+            // pridani ramecku
             kliknuteTlacitko.BorderWidth = 3;
             kliknuteTlacitko.BorderColor = Color.Parse("#333333");
         }
 
+        // zruseni upravy
         private void OnZrusitUpravuClicked(object sender, EventArgs e)
         {
             UpravitOverlay.IsVisible = false;
             _kategorieKUprave = null;
         }
 
+        // potvrzeni upravy
         private void OnUlozitUpravuClicked(object sender, EventArgs e)
         {
+            // kontrola prazdneho inputu
             if (string.IsNullOrWhiteSpace(UpravitNazevEntry.Text))
             {
                 return;
@@ -178,9 +203,11 @@ namespace osobniSpravceFinanci
 
             if (_kategorieKUprave != null)
             {
+                // prepsani hodnot
                 _kategorieKUprave.Nazev = UpravitNazevEntry.Text;
                 _kategorieKUprave.Barva = _zvolenaBarvaProUpravu;
 
+                // zapsani do databaze
                 _kategorieService.UpravitKategorii(_kategorieKUprave);
                 ObnovitSeznam();
 
